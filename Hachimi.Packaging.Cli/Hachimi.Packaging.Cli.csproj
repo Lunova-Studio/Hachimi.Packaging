@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Hachimi.Packaging.AppImage\Hachimi.Packaging.AppImage.csproj" />
       <ProjectReference Include="..\Hachimi.Packaging.Portable\Hachimi.Packaging.Portable.csproj" />
     </ItemGroup>
 

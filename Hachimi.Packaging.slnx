@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/Packaging/">
+    <Project Path="Hachimi.Packaging.AppBundle/Hachimi.Packaging.AppBundle.csproj" />
+    <Project Path="Hachimi.Packaging.AppImage/Hachimi.Packaging.AppImage.csproj" />
     <Project Path="Hachimi.Packaging.Portable/Hachimi.Packaging.Portable.csproj" />
     <Project Path="Hachimi.Packaging/Hachimi.Packaging.csproj" />
   </Folder>
