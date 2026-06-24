@@ -5,11 +5,11 @@ public class AppImagePackageSettings : PackageSettings {
     /// 应用显示名称
     /// </summary>
     public string DisplayName { get; set; } = string.Empty;
-
+    
     /// <summary>
-    /// 应用版本
+    /// 图标绝对路径
     /// </summary>
-    public string Version { get; set; } = "1.0.0";
+    public string IconPath { get; set; } = string.Empty;
 
     /// <summary>
     /// 目标架构 (x86_64, i686, aarch64 等)
@@ -19,5 +19,20 @@ public class AppImagePackageSettings : PackageSettings {
     /// <summary>
     /// 应用描述
     /// </summary>
-    public string? Description { get; set; }
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 是否在打开程序时显示终端
+    /// </summary>
+    public bool IsTerminal { get; set; } = true;
+    
+    /// <summary>
+    /// 应用分类
+    /// </summary>
+    public IReadOnlyCollection<string> Categories { get; set; }
+    
+    /// <summary>
+    /// 搜索关键词（辅助用户在启动器搜索）
+    /// </summary>
+    public IReadOnlyCollection<string> Keywords { get; set; }
 }

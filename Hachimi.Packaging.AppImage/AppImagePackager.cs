@@ -10,11 +10,13 @@ namespace Hachimi.Packaging.AppImage;
 
 public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings> {
     private readonly ILogger _logger;
+    private readonly AppImageBundleBuilder _builder;
+    
     private const int BufferSize = 65536;
 
-    public AppImagePackager(ILogger logger)
-    {
+    public AppImagePackager(ILogger logger) {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _builder = new AppImageBundleBuilder();
     }
 
     public async Task PackAsync(
@@ -25,7 +27,7 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
         var context = contextConfigure(new PackagingContext());
         var settings = settingsConfigure(new AppImagePackageSettings());
 
-        ValidateInputs(context, settings);
+        Validate(context, settings);
         await BuildAppImageAsync(context, settings, CancellationToken.None);
 
         _logger.LogInformation("AppImage package created successfully.");
@@ -45,7 +47,7 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
         }
     }
 
-    private void ValidateInputs(PackagingContext context, AppImagePackageSettings settings) {
+    private void Validate(PackagingContext context, AppImagePackageSettings settings) {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(settings);
 
@@ -61,17 +63,20 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
         if (string.IsNullOrWhiteSpace(settings.AppName))
             throw new ArgumentException("AppName not specified.", nameof(settings));
 
-        LogPackageInfo(settings.AppName, settings.Version, settings.Architecture);
+        LogPackageInfo(settings.AppName, settings.Architecture);
     }
 
     private async Task BuildAppImageAsync(PackagingContext context, AppImagePackageSettings settings, CancellationToken cancellationToken) {
         var tempSquashFSPath = Path.Combine(Path.GetTempPath(), $"appimage-{Guid.NewGuid():N}.squashfs");
-
+        var tempDir = string.Empty;
+        
         try {
+            tempDir = await _builder.BuildAsync(context, settings);
+            
             LogBuildStep(1, "Building SquashFS image...");
             
             var squashFSBuilder = new SquashFsBuilder(SqCompressionType.Gzip);
-            squashFSBuilder.AddDirectory(context.Source);
+            squashFSBuilder.AddDirectory(tempDir);
             squashFSBuilder.Build(tempSquashFSPath);
 
             LogBuildStep(2, "Reading SquashFS data...");
@@ -102,6 +107,8 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
         } finally {
             if (File.Exists(tempSquashFSPath))
                 File.Delete(tempSquashFSPath);
+
+            new DirectoryInfo(tempDir).Parent?.Delete(true);
         }
     }
 
@@ -149,8 +156,8 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
 
     #region Logging
     
-    [LoggerMessage(LogLevel.Information, "Package Info - Name: {AppName}, Version: {Version}, Arch: {Architecture}")]
-    private partial void LogPackageInfo(string appName, string version, string architecture);
+    [LoggerMessage(LogLevel.Information, "Package Info - Name: {AppName}, Arch: {Architecture}")]
+    private partial void LogPackageInfo(string appName, string architecture);
 
     [LoggerMessage(LogLevel.Information, "Step {Step}/4: {Message}")]
     private partial void LogBuildStep(int step, string message);
