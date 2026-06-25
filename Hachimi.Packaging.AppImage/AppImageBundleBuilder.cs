@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Text;
 using Hachimi.Packaging.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -66,11 +67,11 @@ public sealed class AppImageBundleBuilder : IBundleBuilder<AppImagePackageSettin
     private static async Task CreateAppRunAsync(AppImagePackageSettings settings, string layoutDir) {
         var path = Path.Combine(layoutDir, "AppRun");
         var text = $"""
-                   #!/bin/bash
-                   exec "$APPDIR/usr/bin/{settings.AppName}" "$@"
-                   """;
+                     #!/bin/bash
+                     exec "$APPDIR/usr/bin/{settings.AppName}" "$@"
+                     """;
         
-        await File.WriteAllTextAsync(path, text);
+        await File.WriteAllTextAsync(path, text, new UTF8Encoding(false));
         if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) 
             File.SetUnixFileMode(path, UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
         
@@ -92,7 +93,7 @@ public sealed class AppImageBundleBuilder : IBundleBuilder<AppImagePackageSettin
                      {Map(settings.Categories, "Categories=")}
                      """;
         
-        return File.WriteAllTextAsync(Path.Combine(layoutDir, $"{settings.AppName}.desktop"), text);
+        return File.WriteAllTextAsync(Path.Combine(layoutDir, $"{settings.AppName}.desktop"), text, new UTF8Encoding(false));
     }
 
     private static string Map<T>(IReadOnlyCollection<T> enumerable, string head = "") =>

@@ -24,7 +24,7 @@ public class AppImagePackageSettings : PackageSettings {
     /// <summary>
     /// 是否在打开程序时显示终端
     /// </summary>
-    public bool IsTerminal { get; set; } = true;
+    public bool IsTerminal { get; set; }
     
     /// <summary>
     /// 应用分类
