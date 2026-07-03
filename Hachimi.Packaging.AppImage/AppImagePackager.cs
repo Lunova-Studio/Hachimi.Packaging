@@ -72,7 +72,7 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
         
         try {
             tempDir = await _builder.BuildAsync(context, settings);
-            Console.WriteLine(tempDir);
+            
             LogBuildStep(1, "Building SquashFS image...");
             
             var squashFSBuilder = new SquashFsBuilder(SqCompressionType.Gzip);
@@ -108,8 +108,8 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
         } finally {
             if (File.Exists(tempSquashFSPath))
                 File.Delete(tempSquashFSPath);
-
-            // new DirectoryInfo(tempDir).Parent?.Delete(true);
+            
+            new DirectoryInfo(tempDir).Parent?.Delete(true);
         }
     }
 

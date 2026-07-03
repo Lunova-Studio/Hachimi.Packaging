@@ -5,16 +5,34 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <Authors>Yang429</Authors>
+        <Title>Hachimi.Packaging.Cli</Title>
+        <Description>A simple tool for packaging applications</Description>
+        <PackageProjectUrl>https://github.com/Lunova-Studio/Hachimi.Packaging</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/Lunova-Studio/Hachimi.Packaging</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>appimage;macos;packager;packaging;cli;dotnet;deployment;publish;linux;portable</PackageTags>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>hachimi</ToolCommandName>
+    </PropertyGroup>
+    
     <ItemGroup>
-      <PackageReference Include="System.CommandLine" Version="3.0.0-preview.5.26302.115" />
+        <PackageReference Include="System.CommandLine" Version="3.0.0-preview.5.26302.115" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Hachimi.Packaging.AppBundle\Hachimi.Packaging.AppBundle.csproj" />
-      <ProjectReference Include="..\Hachimi.Packaging.AppImage\Hachimi.Packaging.AppImage.csproj" />
-      <ProjectReference Include="..\Hachimi.Packaging.Portable\Hachimi.Packaging.Portable.csproj" />
+        <ProjectReference Include="..\Hachimi.Packaging.AppBundle\Hachimi.Packaging.AppBundle.csproj" />
+        <ProjectReference Include="..\Hachimi.Packaging.AppImage\Hachimi.Packaging.AppImage.csproj" />
+        <ProjectReference Include="..\Hachimi.Packaging.Portable\Hachimi.Packaging.Portable.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Assets\icon.png" Pack="true" PackagePath="" />
     </ItemGroup>
 
 </Project>

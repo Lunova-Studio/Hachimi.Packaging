@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using Hachimi.Packaging.Interfaces;
 using Microsoft.Extensions.Logging;
 

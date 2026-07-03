@@ -15,11 +15,9 @@ var factory = LoggerFactory.Create(builder => {
 var logger = factory.CreateLogger("Program");
 
 var command = new RootCommand("Hachimi.Packaging") {
-    new Command("hachimi", "miaomiaomiao?") {
-        new PortableCommand(logger).Build(),
-        new AppImageCommand(logger).Build(),
-        new AppBundleCommand(logger).Build()
-    }
+    new PortableCommand(logger).Build(),
+    new AppImageCommand(logger).Build(),
+    new AppBundleCommand(logger).Build()
 };
 
 return await command.Parse(args).InvokeAsync();

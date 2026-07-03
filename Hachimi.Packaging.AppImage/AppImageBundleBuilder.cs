@@ -8,7 +8,7 @@ namespace Hachimi.Packaging.AppImage;
 public sealed class AppImageBundleBuilder : IBundleBuilder<AppImagePackageSettings> {
     //TODO: metainfo
     public async Task<string> BuildAsync(PackagingContext context, AppImagePackageSettings settings) { 
-        var (layoutDir, binDir, shareDir) = CreateAppDir();
+        var (layoutDir, binDir, _) = CreateAppDir();
         
         CopyExec(context,  binDir);
         CopyIcon(settings, layoutDir);

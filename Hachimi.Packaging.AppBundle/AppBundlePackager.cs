@@ -24,7 +24,7 @@ public sealed partial class AppBundlePackager: IPackager<AppBundlePackageSetting
         try {
             var appDir = await _appBundleBuilder.BuildAsync(context, settings);
 
-            _logger.LogInformation("Created app directory {appDir}", appDir);
+            LogCreatedAppDirectoryAppdir(appDir);
             await CreateZipPackageAsync(appDir, context);
         } catch (Exception e) {
             _logger.LogError(e, "Failed to create app bundle package.");
@@ -61,6 +61,9 @@ public sealed partial class AppBundlePackager: IPackager<AppBundlePackageSetting
     
     [LoggerMessage(LogLevel.Information, "Zip archive created with {filesLength} files")]
     partial void LogZipArchiveCreatedWithFiles(int filesLength);
-    
+
+    [LoggerMessage(LogLevel.Information, "Created app directory {appDir}")]
+    partial void LogCreatedAppDirectoryAppdir(string appDir);
+
     #endregion
 }
