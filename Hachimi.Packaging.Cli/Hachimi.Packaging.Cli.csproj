@@ -19,6 +19,8 @@
         <PackageTags>appimage;macos;packager;packaging;cli;dotnet;deployment;publish;linux;portable</PackageTags>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>hachimi</ToolCommandName>
+        <Company>Lunova-Studio</Company>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     
     <ItemGroup>
@@ -32,6 +34,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="..\README.md">
+          <Pack>True</Pack>
+          <PackagePath>\</PackagePath>
+        </None>
         <None Include="Assets\icon.png" Pack="true" PackagePath="" />
     </ItemGroup>
 
