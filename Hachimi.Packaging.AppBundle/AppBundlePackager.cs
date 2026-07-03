@@ -1,71 +1,66 @@
+using System.Collections.Immutable;
+using System.IO.Compression;
 using Hachimi.Packaging.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Hachimi.Packaging.AppBundle;
 
 /// <summary>
-/// 应用程序包打包器
+/// MacOS 应用程序包打包器
 /// </summary>
 public sealed partial class AppBundlePackager: IPackager<AppBundlePackageSettings> {
-    private  readonly ILogger _logger;
-    
-    private string InfoPlistPath { get; set; }
-    private string MacOSDirectory { get; set; }
-    private string ContentsDirectory { get; set; }
-    private string ResourcesDirectory { get; set; }
+    private readonly ILogger _logger;
+    private readonly AppBundleBuilder _appBundleBuilder;
 
     public AppBundlePackager(ILogger logger) {
         _logger = logger;
+        _appBundleBuilder = new AppBundleBuilder();
     }
     
-    public Task PackAsync(Configure<PackagingContext> contextConfigure, Configure<AppBundlePackageSettings> settingsConfigure) {
+    public async Task PackAsync(Configurator<PackagingContext> contextConfigure, Configurator<AppBundlePackageSettings> settingsConfigure) {
         var context = contextConfigure(new PackagingContext());
         var settings = settingsConfigure(new AppBundlePackageSettings());
 
-        var appPath = context.OutputPath;
-        ContentsDirectory = Path.Combine(appPath, "Contents");
-        MacOSDirectory = Path.Combine(ContentsDirectory, "MacOS");
-        InfoPlistPath = Path.Combine(ContentsDirectory, "Info.plistqi");
-        ResourcesDirectory = Path.Combine(ContentsDirectory, "Resources");
+        try {
+            var appDir = await _appBundleBuilder.BuildAsync(context, settings);
+
+            _logger.LogInformation("Created app directory {appDir}", appDir);
+            await CreateZipPackageAsync(appDir, context);
+        } catch (Exception e) {
+            _logger.LogError(e, "Failed to create app bundle package.");
+            throw;
+        }
         
-        CreateAppBundle(appPath);
-
-        throw new Exception();
+        _logger.LogInformation("Portable package created successfully.");
     }
 
-    private void CreateAppBundle(string appPath) {
-        if (Directory.Exists(appPath))
-            Directory.Delete(appPath, true);
-
-        Directory.CreateDirectory(appPath!);
-        Directory.CreateDirectory(ContentsDirectory);
-        Directory.CreateDirectory(MacOSDirectory);
-        Directory.CreateDirectory(ResourcesDirectory);
-                                                               
-        _logger.LogInformation("App bundle created successfully.");
-    }
-
-    private void CopyAppIcon(string iconPath) {
-        var iconFileName = $".icns";
-        var destPath = Path.Combine(ResourcesDirectory, iconFileName);
+    private async Task CreateZipPackageAsync(string appDir, PackagingContext context) {
+        _logger.LogInformation("Creating zip archive...");
         
-        File.Copy(iconPath, destPath, true);
-        LogIconCopyToResourcesDirectory(iconFileName);
-    }
+        if (File.Exists(context.OutputPath))
+            File.Delete(context.OutputPath);
+        
+        await using var archive = await ZipFile.OpenAsync(context.OutputPath, ZipArchiveMode.Create);
+        
+        var appFolderName = Path.GetFileName(appDir);
+        var files = Directory.EnumerateFiles(appDir, "*", SearchOption.AllDirectories)
+            .ToImmutableArray();
+                
+        foreach (var file in files) {
+            var relativePath = Path.GetRelativePath(appDir, file);
+            var entryName = Path.Combine(appFolderName, relativePath)
+                .Replace("\\", "/");
+            
+            await archive.CreateEntryFromFileAsync(file, entryName, CompressionLevel.SmallestSize);
+        }
+        
+        LogZipArchiveCreatedWithFiles(files.Length);
+    } 
 
     #region LogMessages
-
-    [LoggerMessage(LogLevel.Information, "Icon copied to Resources directory: {fileName}")]
-    partial void LogIconCopyToResourcesDirectory(string fileName);
-
-    #endregion
-}
-
-public class AppBundlePackageSettings : PackageSettings {
-    /// <summary>
-    /// <c>.icns</c>
-    /// </summary>
-    public string AppIconPath { get; set; }
     
-    public string Project { get; set; } 
+    [LoggerMessage(LogLevel.Information, "Zip archive created with {filesLength} files")]
+    partial void LogZipArchiveCreatedWithFiles(int filesLength);
+    
+    #endregion
 }

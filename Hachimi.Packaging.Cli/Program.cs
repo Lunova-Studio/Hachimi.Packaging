@@ -1,26 +1,25 @@
-﻿using Hachimi.Packaging.AppImage;
-using Hachimi.Packaging.Cli;
-using Hachimi.Packaging.Extensions;
-using NyaFs.Filesystem.SquashFs;
-using NyaFs.Filesystem.SquashFs.Types;
+﻿using System.CommandLine;
+using Hachimi.Packaging.Cli.Commands;
+using Microsoft.Extensions.Logging;
+using ZLogger;
 
-LogMessages.Create();
+var factory = LoggerFactory.Create(builder => {
+    builder.AddZLoggerConsole(x => {
+        x.UsePlainTextFormatter(c => {
+            c.SetPrefixFormatter($"[{0}] [{1:short}]: ", (in template, in info) => template.Format(info.Timestamp, info.LogLevel));
+            c.SetExceptionFormatter((writer, ex) => Utf8StringInterpolation.Utf8String.Format(writer, $"{ex.Message}"));
+        });
+    });
+});
+        
+var logger = factory.CreateLogger("Program");
 
-var testPath = @"E:\Workspace\ICode\C#\nuke_test\artifacts";
+var command = new RootCommand("Hachimi.Packaging") {
+    new Command("hachimi", "miaomiaomiao?") {
+        new PortableCommand(logger).Build(),
+        new AppImageCommand(logger).Build(),
+        new AppBundleCommand(logger).Build()
+    }
+};
 
-#region MyRegion
-
-var packager = new AppImagePackager(LogMessages.Logger);
-
-await packager.PackAsync(x => {
-    x.Source = Path.Combine(testPath, "linux-x64");
-    x.OutputPath = Path.Combine(testPath, "ttt.AppImage");
-    return x;
-}, s => s
-    .SetArchitecture("x86_64")
-    .SetDisplayName("Nuke Test")
-    .SetDescription("TTT")
-    .SetAppName("nuke_test_avalonia")
-    .SetIcon(@"E:\Workspace\ICode\C#\nuke_test\nuke_test_avalonia\Assets\icon.png"));
-
-#endregion
+return await command.Parse(args).InvokeAsync();

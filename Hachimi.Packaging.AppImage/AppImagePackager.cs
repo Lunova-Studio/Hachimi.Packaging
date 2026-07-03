@@ -20,8 +20,8 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
     }
 
     public async Task PackAsync(
-        Configure<PackagingContext> contextConfigure,
-        Configure<AppImagePackageSettings> settingsConfigure) {
+        Configurator<PackagingContext> contextConfigure,
+        Configurator<AppImagePackageSettings> settingsConfigure) {
         _logger.LogInformation("Starting AppImage package build...");
 
         var context = contextConfigure(new PackagingContext());
@@ -72,11 +72,12 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
         
         try {
             tempDir = await _builder.BuildAsync(context, settings);
-            
+            Console.WriteLine(tempDir);
             LogBuildStep(1, "Building SquashFS image...");
             
             var squashFSBuilder = new SquashFsBuilder(SqCompressionType.Gzip);
             squashFSBuilder.AddDirectory(tempDir);
+            squashFSBuilder.AddSymLink($"{settings.AppName}{Path.GetExtension(settings.IconPath)}", "/.DirIcon");
             squashFSBuilder.Build(tempSquashFSPath);
 
             LogBuildStep(2, "Reading SquashFS data...");
@@ -108,7 +109,7 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
             if (File.Exists(tempSquashFSPath))
                 File.Delete(tempSquashFSPath);
 
-            new DirectoryInfo(tempDir).Parent?.Delete(true);
+            // new DirectoryInfo(tempDir).Parent?.Delete(true);
         }
     }
 
@@ -157,7 +158,7 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
     #region Logging
     
     [LoggerMessage(LogLevel.Information, "Package Info - Name: {AppName}, Arch: {Architecture}")]
-    private partial void LogPackageInfo(string appName, string architecture);
+    private partial void LogPackageInfo(string appName, Architecture architecture);
 
     [LoggerMessage(LogLevel.Information, "Step {Step}/4: {Message}")]
     private partial void LogBuildStep(int step, string message);

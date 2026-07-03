@@ -1,9 +1,9 @@
 namespace Hachimi.Packaging.Extensions;
 
 public static class PackagingContextExtension {
-    public static void WithSource(this PackagingContext context, string source) => 
-        context.Source = source;
-    
-    public static void WithOutput(this PackagingContext context, string output) => 
-        context.OutputPath = output;
+    public static PackagingContext SetSource(this PackagingContext settings, string source) =>
+        settings.Modify(x => x.Source = source);
+        
+    public static PackagingContext SetOutput(this PackagingContext settings, string output) =>
+        settings.Modify(x => x.OutputPath = output);
 }

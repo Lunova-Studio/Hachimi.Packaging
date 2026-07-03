@@ -8,6 +8,10 @@ public static class SquashFsExtension {
     private const uint DIR_MODE = 0x755;
     private const uint FILE_MODE = 0x644;
     private const uint EXEC_MODE = 0x755;
+
+    internal static void AddSymLink(this SquashFsBuilder builder, string target, string path) {
+        builder.SymLink(path, target,UID, GID, FILE_MODE);
+    }
     
     internal static void AddDirectory(this SquashFsBuilder builder, string directory) {
         if (!Directory.Exists(directory))

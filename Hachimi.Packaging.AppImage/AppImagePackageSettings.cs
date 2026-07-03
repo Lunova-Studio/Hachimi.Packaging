@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Hachimi.Packaging.AppImage;
 
 public class AppImagePackageSettings : PackageSettings {
@@ -12,9 +14,9 @@ public class AppImagePackageSettings : PackageSettings {
     public string IconPath { get; set; } = string.Empty;
 
     /// <summary>
-    /// 目标架构 (x86_64, i686, aarch64 等)
+    /// 目标架构
     /// </summary>
-    public string Architecture { get; set; } = "x86_64";
+    public Architecture Architecture { get; set; } =  Architecture.X64;
 
     /// <summary>
     /// 应用描述

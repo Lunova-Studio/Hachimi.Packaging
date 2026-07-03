@@ -1,9 +1,7 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 using System.Text;
 using Hachimi.Packaging.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace Hachimi.Packaging.AppImage;
 

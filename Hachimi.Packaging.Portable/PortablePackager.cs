@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Formats.Tar;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 using Hachimi.Packaging.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +15,7 @@ public sealed partial class PortablePackager : IPackager<PortablePackageSettings
         _logger = logger;
     }
     
-    public async Task PackAsync(Configure<PackagingContext> contextConfigure, Configure<PortablePackageSettings> settingsConfigure) {
+    public async Task PackAsync(Configurator<PackagingContext> contextConfigure, Configurator<PortablePackageSettings> settingsConfigure) {
         _logger.LogInformation("Starting Portable package build...");
 
         var context = contextConfigure(new PackagingContext());

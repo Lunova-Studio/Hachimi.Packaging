@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Hachimi.Packaging.AppImage.Helpers;
 
 internal class RuntimeHelper {
@@ -7,7 +9,7 @@ internal class RuntimeHelper {
         Timeout = TimeSpan.FromMinutes(RuntimeDownloadTimeoutMinutes)
     };
     
-    internal static async Task<byte[]> DownloadRuntimeAsync(string architecture) {
+    internal static async Task<byte[]> DownloadRuntimeAsync(Architecture architecture) {
         var url = GetRuntimeUrl(architecture);
 
         var data = await HttpClient.GetByteArrayAsync(url);
@@ -17,12 +19,12 @@ internal class RuntimeHelper {
             : data;
     }
 
-    private static string GetRuntimeUrl(string architecture) {
+    private static string GetRuntimeUrl(Architecture architecture) {
         const string baseUrl = "https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-";
-        return architecture.ToLowerInvariant() switch {
-            "x86" or "x64" or "amd64" or "x86_64" => $"{baseUrl}x86_64",
-            "arm32" or "armhf" => $"{baseUrl}armhf",
-            "arm64" or "aarch64" => $"{baseUrl}aarch64",
+        return architecture switch {
+            Architecture.X86 or Architecture.X64 => $"{baseUrl}x86_64",
+            Architecture.Arm => $"{baseUrl}armhf",
+            Architecture.Arm64 => $"{baseUrl}aarch64",
             _ => throw new ArgumentException($"Unsupported architecture: {architecture}", nameof(architecture))
         };
     }
