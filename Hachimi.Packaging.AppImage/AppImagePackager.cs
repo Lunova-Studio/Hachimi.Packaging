@@ -98,6 +98,11 @@ public sealed partial class AppImagePackager : IPackager<AppImagePackageSettings
             SetFileExecutePermission(context.OutputPath);
 
             var fileInfo = new FileInfo(context.OutputPath);
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                fileInfo.UnixFileMode = UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
+                                        UnixFileMode.GroupExecute | UnixFileMode.GroupRead |
+                                        UnixFileMode.OtherRead | UnixFileMode.OtherExecute;
+            
             LogBuildSuccess(context.OutputPath, fileInfo.Length);
         } catch (OperationCanceledException) {
             _logger.LogWarning("AppImage build cancelled");
