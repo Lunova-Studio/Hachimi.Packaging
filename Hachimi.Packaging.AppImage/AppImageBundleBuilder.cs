@@ -71,8 +71,10 @@ public sealed class AppImageBundleBuilder : IBundleBuilder<AppImagePackageSettin
         
         await File.WriteAllTextAsync(path, text, new UTF8Encoding(false));
         if(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) 
-            File.SetUnixFileMode(path, UnixFileMode.UserExecute | UnixFileMode.GroupExecute | UnixFileMode.OtherExecute);
-        
+            File.SetUnixFileMode(path, 
+                UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
+                UnixFileMode.GroupExecute | UnixFileMode.GroupRead | 
+                UnixFileMode.OtherRead | UnixFileMode.OtherExecute);
     }
 
     private static Task CreateDesktopFileAsync(AppImagePackageSettings settings, string layoutDir) {
